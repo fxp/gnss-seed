@@ -40,7 +40,11 @@ function doAlgo(data, callback) {
 }
 
 router.post('/algo', function (req, res, next) {
-    res.send('algo response');
+    if (true) {
+        res.send('algo response');
+    } else {
+        res.status(500).send('bad data');
+    }
 });
 
 /* GET users listing. */
