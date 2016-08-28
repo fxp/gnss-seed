@@ -1,7 +1,130 @@
 var express = require('express');
 var router = express.Router();
-var Promise = require("bluebird");
 
+var PACKET = {
+    '2004': {
+        headers: [{
+            name: 'msg_number',
+            desc: 'Message Number (e.g.,“1001”= 0011 1110 1001)',
+            type: 'uint12'
+        }, {
+            name: 'ref_station_id',
+            desc: 'Reference Station ID',
+            type: 'uint12'
+        }, {
+            name: 'tow',
+            desc: 'BD2 Epoch Time (TOW)',
+            type: 'uint30'
+        }, {
+            name: 'sync_flag',
+            desc: 'Synchronous GNSS Flag',
+            type: 'bit1'
+        }, {
+            name: 'num_bd2_processed',
+            desc: 'No. of BD2 Satellite Signals Processed',
+            type: 'uint5'
+        }, {
+            name: 'smoothing_indicator',
+            desc: 'BD2 Divergence-free Smoothing Indicator',
+            type: 'bit1'
+        }, {
+            name: 'smoothing_interval',
+            desc: 'GPS Smoothing Interval',
+            type: 'bit3'
+        }],
+        contentLength: 157,
+        content: [{
+            name: 'gps_id',
+            desc: 'GPS Satellite ID',
+            type: 'uint6'
+        }, {
+            name: 'gps_l1_indicator',
+            desc: 'GPS L1 Code Indicator',
+            type: 'bit1'
+        }, {
+            name: 'gps_l1_pseud',
+            desc: 'GPS L1 Pseudorange',
+            type: 'uint24'
+        }, {
+            name: 'gps_l1_phaserange',
+            desc: 'GPS L1 PhaseRange – L1 Pseudorange',
+            type: 'int20'
+        }, {
+            name: 'gps_l1_lock_indicator',
+            desc: 'GPS L1 Lock time Indicator',
+            type: 'uint7'
+        }, {
+            name: 'gps_l1_ambiguity',
+            desc: 'GPS Integer L1 Pseudorange Modulus Ambiguity',
+            type: 'uint8'
+        }, {
+            name: 'gps_l1_cnr',
+            desc: 'GPS L1 CNR',
+            type: 'uint8'
+        }, {
+            name: 'gps_l2_indicator',
+            desc: 'GPS L2 Code Indicator',
+            type: 'bit2'
+        }, {
+            name: 'gps_l2l1_pseud_diff',
+            desc: 'GPS L2-L1 Pseudorange Difference',
+            type: 'int14'
+        }, {
+            name: 'gps_l2_phaserange_l1_pseud',
+            desc: 'GPS L2 PhaseRange – L1 Pseudorange',
+            type: 'int20'
+        }, {
+            name: 'gps_l2_lock_indicator',
+            desc: 'GPS L2 Lock time Indicator',
+            type: 'uint7'
+        }, {
+            name: 'gps_l2_cnr',
+            desc: 'GPS L2 CNR',
+            type: 'uint8'
+        }, {
+            name: 'gps_doppler_l1',
+            desc: 'GPS Doppler (L1)',
+            type: 'int32'
+        }]
+    },
+    '2104': {
+        headers: [{
+            name: 'msg_number',
+            desc: 'Message Number (e.g.,“1001”= 0011 1110 1001)',
+            type: 'uint12'
+        }, {
+            name: 'ref_station_id',
+            desc: 'Reference Station ID',
+            type: 'uint12'
+        }, {
+            name: 'tow',
+            desc: 'BD2 Epoch Time (TOW)',
+            type: 'uint30'
+        }, {
+            name: 'sync_flag',
+            desc: 'Synchronous GNSS Flag',
+            type: 'bit1'
+        }, {
+            name: 'num_bd2_processed',
+            desc: 'No. of BD2 Satellite Signals Processed',
+            type: 'uint5'
+        }, {
+            name: 'smoothing_indicator',
+            desc: 'BD2 Divergence-free Smoothing Indicator',
+            type: 'bit1'
+        }, {
+            name: 'smoothing_interval',
+            desc: 'GPS Smoothing Interval',
+            type: 'bit3'
+        }, {
+            name: 'bd2_indicator',
+            desc: 'BD2 B1/B2/B3  Indicator',
+            type: 'bit3'
+        }],
+        contentLength: 245,
+        content: []
+    }
+}
 
 function Parser(data) {
     var offset = 0;
@@ -60,137 +183,6 @@ function Parser(data) {
     return result;
 }
 
-var PACKET = {
-    '2004': {
-        headers: [{
-            name: 'msg_number',
-            desc: 'Message Number (e.g.,“1001”= 0011 1110 1001)',
-            type: 'uint12'
-        }, {
-            name: 'ref_station_id',
-            desc: 'Reference Station ID',
-            type: 'uint12'
-        }, {
-            name: 'tow',
-            desc: 'BD2 Epoch Time (TOW)',
-            type: 'uint30'
-        }, {
-            name: 'sync_flag',
-            desc: 'Synchronous GNSS Flag',
-            type: 'bit1'
-        }, {
-            name: 'num_bd2_processed',
-            desc: 'No. of BD2 Satellite Signals Processed',
-            type: 'uint5'
-        }, {
-            name: 'smoothing_indicator',
-            desc: 'BD2 Divergence-free Smoothing Indicator',
-            type: 'bit1'
-        }, {
-            name: 'smoothing_interval',
-            desc: 'GPS Smoothing Interval',
-            type: 'bit3'
-        }],
-        content: [{
-            name: 'smoothing_interval',
-            desc: 'GPS Smoothing Interval',
-            type: 'bit3'
-        }, {
-            name: 'smoothing_interval',
-            desc: 'GPS Smoothing Interval',
-            type: 'bit3'
-        }]
-    },
-    '2104': {
-        headers: [{
-            name: 'msg_number',
-            desc: 'Message Number (e.g.,“1001”= 0011 1110 1001)',
-            type: 'uint12'
-        }, {
-            name: 'ref_station_id',
-            desc: 'Reference Station ID',
-            type: 'uint12'
-        }, {
-            name: 'tow',
-            desc: 'BD2 Epoch Time (TOW)',
-            type: 'uint30'
-        }, {
-            name: 'sync_flag',
-            desc: 'Synchronous GNSS Flag',
-            type: 'bit1'
-        }, {
-            name: 'num_bd2_processed',
-            desc: 'No. of BD2 Satellite Signals Processed',
-            type: 'uint5'
-        }, {
-            name: 'smoothing_indicator',
-            desc: 'BD2 Divergence-free Smoothing Indicator',
-            type: 'bit1'
-        }, {
-            name: 'smoothing_interval',
-            desc: 'GPS Smoothing Interval',
-            type: 'bit3'
-        }, {
-            name: 'bd2_indicator',
-            desc: 'BD2 B1/B2/B3  Indicator',
-            type: 'bit3'
-        }],
-        content: [{
-            name: 'gps_id',
-            desc: 'GPS Satellite ID',
-            type: 'uint6'
-        }, {
-            name: 'gps_l1_indicator',
-            desc: 'GPS L1 Code Indicator',
-            type: 'bit1'
-        }, {
-            name: 'gps_l1_pseud',
-            desc: 'GPS L1 Pseudorange',
-            type: 'uint24'
-        }, {
-            name: 'gps_l1_phaserange',
-            desc: 'GPS L1 PhaseRange – L1 Pseudorange',
-            type: 'int20'
-        }, {
-            name: 'gps_l1_lock_indicator',
-            desc: 'GPS L1 Lock time Indicator',
-            type: 'uint7'
-        }, {
-            name: 'gps_l1_ambiguity',
-            desc: 'GPS Integer L1 Pseudorange Modulus Ambiguity',
-            type: 'uint8'
-        }, {
-            name: 'gps_l1_cnr',
-            desc: 'GPS L1 CNR',
-            type: 'uint8'
-        }, {
-            name: 'gps_l2_indicator',
-            desc: 'GPS L2 Code Indicator',
-            type: 'bit2'
-        }, {
-            name: 'gps_l2l1_pseud_diff',
-            desc: 'GPS L2-L1 Pseudorange Difference',
-            type: 'int14'
-        }, {
-            name: 'gps_l2_phaserange_l1_pseud',
-            desc: 'GPS L2 PhaseRange – L1 Pseudorange',
-            type: 'int20'
-        }, {
-            name: 'gps_l2_lock_indicator',
-            desc: 'GPS L2 Lock time Indicator',
-            type: 'uint7'
-        }, {
-            name: 'gps_l2_cnr',
-            desc: 'GPS L2 CNR',
-            type: 'uint8'
-        }, {
-            name: 'gps_doppler_l1',
-            desc: 'GPS Doppler (L1)',
-            type: 'int32'
-        }]
-    }
-}
-
 function readPkg(data) {
     var parser = new Parser(data);
     var result = {};
@@ -212,6 +204,13 @@ function readPkg(data) {
             throw new Error('no parser for ' + field.type);
         }
     }
+    // var contentCount = Math.floor(result.length / protocol.contentLength);
+    // console.log('protocol:' + result.msg_number);
+    // console.log('result.length:' + result.length);
+    // console.log('protocol.contentLength:' + protocol.contentLength);
+    // console.log('content.count:' + contentCount);
+    // console.log('diff:' + (result.length - protocol.contentLength));
+
     for (var i = 1; i < protocol.content.length; i++) {
         var field = protocol.content[i];
         if (parser[field.type]) {
@@ -230,83 +229,47 @@ var PkgParser = {
     }
 };
 
-var Logger = {
-    logRaw: function (raw, station_id) {
-        // TODO
-        console.log(station_id + ',' + raw);
-    }
-}
-
-var unirest = require("unirest");
-
-function doAlgo(data, callback) {
-    var req = unirest("POST", "http://127.0.0.1:3000/api/1/algo");
-
-    req.type("json");
-    req.send({
-        "name": "123"
-    });
-
-    req.end(function (res) {
-        // if (res.error) throw new Error(res.error);
-        if (callback) {
-            callback({}, res.body);
-        }
-    });
-
-}
-
-router.post('/algo', function (req, res, next) {
-    if (true) {
-        res.send('algo response');
-    } else {
-        res.status(500).send('bad data');
-    }
-});
-
-var fs = require('fs');
-
 /* GET users listing. */
 router.post('/station/:station_id', function (req, res, next) {
     var raw = req.body,
         station_id = req.params.station_id;
 
-    // TODO add timestamp?
-    Logger.logRaw(raw, station_id);
+    var data = req.body;
+    console.log('post size:' + data.length);
 
-    fs.readFile("/Users/fengxiaoping/Downloads/rover.txt", function (err, data) {
-        if (err) throw err;
+    // // TODO add timestamp?
+    // fs.readFile("/Users/fengxiaoping/Downloads/rover.txt", function (err, data) {
+    //     if (err) throw err;
+    //     console.log(data.length);
+    // });
 
-        for (var i = 0; i < data.length; i++) {
-            if ((data.readUInt8(i) == 211 )) {
-                if ((data.readUInt8(i + 1) & 252) === 0) {
-                    var len = data[i + 2] | data[i + 1] << 8;
-                    // if (len > 0 && (i == 128)) {
-                    if (len > 0) {
-                        console.log(i + ',' + len);
-                        // var pkg = Buffer.from(data, i, len + 3);
-                        // 3 bytes for header, 3 bytes for tail
-                        // var pkg = Buffer.from(data, i, len + 3 + 3);
-                        // console.log(pkg.length);
-                        const buf2 = Buffer.alloc(len + 3 + 3);
-                        data.copy(buf2, 0, i, i + len + 3 + 3);
-                        readPkg(buf2)
-                        i += len;
-                        var result = PkgParser.parse(buf2);
-                        console.log(result);
-                        // break;
-                        doAlgo(result, function (err, data) {
-                            if (err) {
-                                res.status(500).send("");
-                            } else {
-                                res.send('ok');
-                            }
-                        });
+    var pkgCount = 0;
+    for (var i = 0; i < data.length; i++) {
+        if ((data.readUInt8(i) == 211 )) {
+            if ((data.readUInt8(i + 1) & 252) === 0) {
+                var len = data[i + 2] | data[i + 1] << 8;
+                if (len > 0) {
+                    console.log('len:' + len);
+                    const buf2 = Buffer.alloc(len + 3 + 3);
+                    data.copy(buf2, 0, i, i + len + 3 + 3);
+                    var result = PkgParser.parse(buf2);
+                    if (result) {
+                        console.log({
+                            protocol: result.msg_number,
+                            index: i,
+                            len: len,
+                            result: result
+                        })
                     }
+                    i += len;
+                    pkgCount++;
                 }
             }
         }
-    })
+    }
+    res.send({
+        total: pkgCount
+    });
 });
 
 module.exports = router;
